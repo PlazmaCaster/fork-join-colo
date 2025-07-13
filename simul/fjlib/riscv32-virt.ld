@@ -17,7 +17,7 @@ OUTPUT_ARCH(riscv)
 PROVIDE(__GLOBAL_CORES = 8 );
 PROVIDE(__GLOBAL_BYTES = 1024);
 /* Cache Bytes */
-CBYTES = 0x2000; /* 8KB of cache */
+CBYTES = 0x0400; /* 1KB of cache */
 
 MEMORY
 {	/* Add RAM that can be read, written, and executed */
@@ -34,7 +34,7 @@ SECTIONS
   PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x10000)); . = SEGMENT_START("text-segment", 0x10000) + SIZEOF_HEADERS;
 
   /* Set the stack to the bottom of memory */
-  PROVIDE (__stack_top = ORIGIN(RAM) + LENGTH(RAM));
+  PROVIDE (__stack_top = ORIGIN(RAM) + LENGTH(RAM) - 0);
 
   .interp         : { *(.interp) }
   .note.gnu.build-id  : { *(.note.gnu.build-id) }
@@ -80,7 +80,7 @@ SECTIONS
     libfj.a(.text)
   }
   .plt            : { *(.plt) *(.iplt) }
-  
+
   .text           :
   {
 
