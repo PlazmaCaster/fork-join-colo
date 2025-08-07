@@ -26,7 +26,8 @@ object04(void)
 {
 	expint(50, 1);
 	/* with  expint(50,21) as argument, runs the short path */
-	/* in expint.   expint(50,1)  gives the longest execution time */
+    /* in expint.   expint(50,1)  gives the longest execution time */
+    EXIT;
 }
 
 long int object(4)
@@ -86,4 +87,4 @@ expint(int n, long int x)
 
 	}
 	return ans;
-} 
+}

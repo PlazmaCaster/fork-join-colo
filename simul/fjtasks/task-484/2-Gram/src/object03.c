@@ -138,5 +138,6 @@ object03(void)
 	i1 = icrc(0, n, (short) 0, 1);
 	lin[n + 1] = HIBYTE(i1);
 	lin[n + 2] = LOBYTE(i1);
-	i2 = icrc(i1, n + 2, (short) 0, 1);
+    i2 = icrc(i1, n + 2, (short)0, 1);
+    EXIT;
 }

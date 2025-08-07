@@ -119,7 +119,7 @@ object18()
 
   /*  chkerr = ludcmp(nmax, n, eps); */
   chkerr = ludcmp(nmax,n);
-
+  EXIT;
 }
 
 int object(18)

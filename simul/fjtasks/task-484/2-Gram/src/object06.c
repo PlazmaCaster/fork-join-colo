@@ -104,4 +104,5 @@ object06()
 #ifdef DEBUG
 	printf("Outer Loop : %d ,  Inner Loop : %d\n", cnt1, cnt2);
 #endif
+    EXIT;
 }

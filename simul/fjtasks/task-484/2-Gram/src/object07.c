@@ -402,5 +402,5 @@ object07(void)
 	}
 
 	jpeg_fdct_islow();
-
+    EXIT;
 }

@@ -29,7 +29,8 @@ void            Initialize(/*int Array[]*/);
 void object(2) object02(void) {
 	int Array[MAXDIM];
 	Initialize(Array);
-	BubbleSort(Array);
+    BubbleSort(Array);
+    EXIT;
 }
 
 void object(2) Initialize(int Array[])

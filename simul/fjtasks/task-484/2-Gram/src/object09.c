@@ -73,7 +73,8 @@ object09(void)
 	printf("\n   *** MATRIX MULTIPLICATION BENCHMARK TEST ***\n\n");
 	printf("RESULTS OF THE TEST:\n");
 #endif
-	Test(/*ArrayA, ArrayB, ResultArray*/);
+    Test(/*ArrayA, ArrayB, ResultArray*/);
+    EXIT;
 }
 
 

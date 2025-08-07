@@ -73,7 +73,8 @@ void object(1) reset_data(struct DATA data[15]) {
 void object(1) object01(void) {
         struct DATA data[15];
         reset_data(data);
-	binary_search(data, 8);
+        binary_search(data, 8);
+        EXIT;
 }
 
 int object(1)
@@ -98,4 +99,3 @@ binary_search(struct DATA data[15], int x)
 	}
 	return fvalue;
 }
-

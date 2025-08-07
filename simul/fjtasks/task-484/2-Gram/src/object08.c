@@ -102,5 +102,6 @@ object08(void)
 	    a = a & 0x0F;
 	    OUT = num_to_lcd(a);
 	  }
-	}
+    }
+    EXIT;
 }

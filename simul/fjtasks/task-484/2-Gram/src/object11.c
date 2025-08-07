@@ -538,4 +538,5 @@ object11(void)
 #else
 	foo(400);
 #endif
+    EXIT;
 }

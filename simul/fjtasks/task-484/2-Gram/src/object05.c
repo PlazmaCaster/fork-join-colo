@@ -219,5 +219,5 @@ void object(5) object05(void)
 	/* inverse fft */
 	flag = 1;
 	chkerr = fft1(n, flag);
-
+    EXIT;
 }
