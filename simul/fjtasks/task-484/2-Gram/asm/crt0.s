@@ -40,12 +40,12 @@ _start:
 	# t0 -- still holds the hartid
 	mul t2, t2, t0
 
-    # li t6, 0x80100000   # Addr chosen arbitrarily to store stack offset
-    # lw t5, 0(t6)        # Grabbing offset
+    li t6, 0x80100000   # Addr chosen arbitrarily to store stack offset
+    lw t5, 0(t6)        # Grabbing offset
 
 	# la sp, __stack_top
 	la sp, __stack_top
-    # sub sp, sp, t5      # Adjusting __stack_top by offset
+    sub sp, sp, t5      # Adjusting __stack_top by offset
 	sub sp, sp, t2
 	# add sp, t2, zero
 	add s0, sp, zero
