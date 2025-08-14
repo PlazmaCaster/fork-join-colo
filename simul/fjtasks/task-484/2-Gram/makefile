@@ -1,22 +1,21 @@
 PFX=riscv32-unknown-elf
 CC=$(PFX)-gcc
 LD=$(PFX)-ld
-LIBPATH=../../../fjlib/
-LIB=-L$(LIBPATH) -lfj
 AS=$(PFX)-as
-INCLUDE=../../../fjlib/inc
-LDFLAGS=--gc-sections -T$(LIBPATH)riscv32-virt.ld
+
+LIB=-L. -lfj
+INCLUDE=inc
+
+LDFLAGS=--gc-sections -Triscv32-virt.ld
 CFLAGS=-I$(INCLUDE) -O0 -g3 -gdwarf-2 -ffreestanding -nostartfiles \
 	-nostdlib -nodefaultlibs -fno-tree-loop-distribute-patterns \
 	-fno-builtin
 
-ALG=$(shell basename $(shell pwd))
 OBJDIR=obj
 OBJECTS=$(patsubst src/%.c,${OBJDIR}/%.o, $(wildcard src/*.c))
 ASMOBJS=$(patsubst asm/%.s,${OBJDIR}/%.o, $(wildcard asm/*.s))
 
-
-all: riscv32-img cache.log data.csv
+all: libfj.a riscv32-img
 
 $(OBJECTS): ${OBJDIR}/%.o : src/%.c | ${OBJDIR}
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -27,17 +26,15 @@ $(ASMOBJS): ${OBJDIR}/%.o : asm/%.s | ${OBJDIR}
 ${OBJDIR}:
 	mkdir ${OBJDIR}
 
-riscv32-img: $(OBJECTS) $(ASMOBJS)
-	$(LD) $(LDFLAGS) $^ $(LIB) -o $@
+libfj.a: $(OBJECTS) $(ASMOBJS)
+	ar -rcs $@ $(OBJECTS) $(ASMOBJS)
 
-cache.log: riscv32-img
-	../../../bin/qemu.sh riscv32-img
-
-data.csv: riscv32-img
-	../../../bin/mqemu.py -f $(ALG) -v -i 100 riscv32-img
+.PHONY: riscv32-img
+riscv32-img: $(OBJECTS)
+	$(LD) $(LDFLAGS) $(LIB) -o $@
 
 clean:
-	rm -rf riscv32-img
+	rm -rf *-img
 	rm -rf ${OBJDIR}
 	rm -rf cache.log
 	rm -rf data.csv
