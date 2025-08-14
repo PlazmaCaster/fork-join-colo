@@ -38,3 +38,5 @@ clean:
 	rm -rf ${OBJDIR}
 	rm -rf cache.log
 	rm -rf data.csv
+	rm -rf cache-logs
+	rm -rf images
