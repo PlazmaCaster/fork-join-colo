@@ -1,5 +1,7 @@
 #! /bin/bash
 
+mkdir -p images
+
 # Build all [0-18]
 if [[ $# == 0 ]]; then
 start=1
