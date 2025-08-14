@@ -100,5 +100,6 @@ my_sqrt(float val)
 void object(16)
 object16()
 {
-	my_sqrt(19.5);
+    my_sqrt(19.5);
+    EXIT;
 }

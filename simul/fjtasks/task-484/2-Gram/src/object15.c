@@ -14,5 +14,6 @@ object15() {
 	i+=4;
 	i+=5;
 	i=0;
-	return;
+    // return;
+    EXIT;
 }

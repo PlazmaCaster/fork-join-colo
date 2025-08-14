@@ -115,5 +115,6 @@ select(unsigned long k, unsigned long n)
 void object(14)
 object14()
 {
-  select(10, 20);
+    select(10, 20);
+    EXIT;
 }

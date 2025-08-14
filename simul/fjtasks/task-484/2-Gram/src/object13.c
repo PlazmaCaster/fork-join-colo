@@ -140,7 +140,7 @@ object13(void)
 	aa[2] = 8.0;
 
 	qurt(aa);
-
+    EXIT;
 }
 
 int object(13)

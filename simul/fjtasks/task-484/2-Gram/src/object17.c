@@ -1208,5 +1208,6 @@ object17(void)
 {
 	init();
 	interface();
-	FH_DU();
+    FH_DU();
+    EXIT;
 }
