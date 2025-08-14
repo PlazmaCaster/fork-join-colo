@@ -17,21 +17,14 @@ SAVES="cache-logs/$1"
 
 # Increments of 4
 for OFFSET in $(seq 0 4 $CACHE_SZ); do
-    # There most certainly is a better way to do this. Job for someone smarter
-    if [[ $OFFSET -lt 16 ]]; then
-        HEADING=$(printf "000%x" $OFFSET)
-    elif [[ $OFFSET -lt 256 ]]; then
-        HEADING=$(printf "00%x" $OFFSET)
-    elif [[ $OFFSET -lt 4096 ]]; then
-        HEADING=$(printf "0%x" $OFFSET)
-    else
-        HEADING=$(printf "%x" $OFFSET)
-    fi
-    HEX_OFFSET="0x0000$HEADING"
+
+    HEX_OFFSET=$(printf "%04x" $OFFSET)
+
+    QEMU_PARAM="0x0000$HEX_OFFSET"
 
     # Pass offset to qemu
-    ../../../bin/qemu.sh $2 "$HEX_OFFSET"
-
+    ../../../bin/qemu.sh $2 "$QEMU_PARAM"
+    # echo $HEX_OFFSET
     # Expensive to do this...
-    cp cache.log "$SAVES/offset-$HEADING.log"
+    # cp cache.log "$SAVES/offset-$HEX_OFFSET.log"
 done
