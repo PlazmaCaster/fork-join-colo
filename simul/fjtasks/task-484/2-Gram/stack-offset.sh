@@ -11,7 +11,7 @@ if [[ $# != 2 ]]; then
     exit 1;
 fi
 
-LOG_DIR="cach-logs/$1"
+LOG_DIR="cache-logs/$1"
 KERNEL="$2"
 
 CACHE_SZ=`grep "CBYTES =" "$LD_FILE" | awk '{print $3}' | sed 's/0x//' | sed 's/;//'`
@@ -30,5 +30,5 @@ for OFFSET in $(seq 0 4 $CACHE_SZ); do
     ../../../bin/qemu.sh "$KERNEL" "$QEMU_PARAM"
 
     # Expensive to do this...
-    cp cache.log "$SAVES/offset-$HEX_OFFSET.log"
+    cp cache.log "$LOG_DIR/offset-$HEX_OFFSET.log"
 done
