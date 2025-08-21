@@ -1,4 +1,0 @@
-These values can exceed what the JSON format accepts natively. To
-avoid complicated code paths the values are scaled by a factor of
-10^3. By example, if an object has a base cost 68, that represents
-68,000 cycles.

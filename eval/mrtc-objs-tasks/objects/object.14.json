@@ -1,7 +1,0 @@
-{
-    "name": "simple",
-    "wcet": {
-        "base": 53,
-        "incr": 1
-    }
-}

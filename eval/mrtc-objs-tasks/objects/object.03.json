@@ -1,7 +1,0 @@
-{
-    "name": "expint",
-    "wcet": {
-        "base": 79,
-        "incr": 4
-    }
-}

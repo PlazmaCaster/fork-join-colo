@@ -1,7 +1,0 @@
-{
-    "name": "minver",
-    "wcet": {
-        "base": 49,
-        "incr": 1
-    }
-}

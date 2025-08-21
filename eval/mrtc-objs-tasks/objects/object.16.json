@@ -1,7 +1,0 @@
-{
-    "name": "statemate",
-    "wcet": {
-        "base": 266,
-        "incr": 3
-    }
-}

@@ -1,7 +1,0 @@
-{
-    "name": "jfdctint",
-    "wcet": {
-        "base": 172,
-        "incr": 5
-    }
-}

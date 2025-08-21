@@ -1,7 +1,0 @@
-{
-    "name": "insertsort",
-    "wcet": {
-        "base": 74,
-        "incr": 3
-    }
-}

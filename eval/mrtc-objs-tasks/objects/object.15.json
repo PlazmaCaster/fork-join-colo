@@ -1,7 +1,0 @@
-{
-    "name": "sqrt",
-    "wcet": {
-        "base": 72,
-        "incr": 1
-    }
-}

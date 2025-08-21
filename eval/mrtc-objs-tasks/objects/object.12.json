@@ -1,7 +1,0 @@
-{
-    "name": "qurt",
-    "wcet": {
-        "base": 114,
-        "incr": 1
-    }
-}

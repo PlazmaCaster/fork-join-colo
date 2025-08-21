@@ -1,7 +1,0 @@
-{
-    "name": "matmult",
-    "wcet": {
-        "base": 485,
-        "incr": 403
-    }
-}
