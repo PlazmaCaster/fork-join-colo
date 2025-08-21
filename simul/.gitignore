@@ -1,7 +1,0 @@
-*.o
-riscv32-img
-cache.log
-graphs
-
-*-img
-*.log

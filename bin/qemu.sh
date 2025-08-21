@@ -15,7 +15,7 @@ opts+=" -smp 1"		# The number of cores (harts)
 
 # libcache enable and parameters
 opts+=" --plugin ${PLUGIN}"
-opts+=',dcachesize=16384,dassoc=2,dblksize=32'
+opts+=",dcachesize=$3,dassoc=2,dblksize=32"
 opts+=',icachesize=16384,iassoc=2,iblksize=32'
 opts+=' -d plugin'
 opts+=' -D cache.log'

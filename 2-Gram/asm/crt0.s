@@ -49,5 +49,5 @@ _start:
 	sub sp, sp, t2
 	# add sp, t2, zero
 	add s0, sp, zero
-	jal zero, object08
+	jal zero, object18
 	.cfi_endproc
