@@ -12,8 +12,8 @@ RANGE=true
 SAVE=false
 HEADER="Offset,Data Miss"
 
-# CACHE_SZ=`grep "CBYTES =" $LD_FILE | sed 's/CBYTES = 0x//' | sed 's/;.*//'`
-# CACHE_SZ=$((16#${CACHE_SZ}))
+CACHE_SZ=`grep "CBYTES =" $LD_FILE | sed 's/CBYTES = 0x//' | sed 's/;.*//'`
+CACHE_SZ=$((16#${CACHE_SZ}))
 
 function usage() {
     cat <<EOF
@@ -27,7 +27,7 @@ function usage() {
     Options:
     -h                  Display this message
     -m <cache>          Sets the cache size provided by the linker script, in
-                        bytes, and re-links.
+                        bytes, and re-links. (WIP)
                         [default: 1024]
     -o <file>           Saves output in CSV format to <file>
     -r <runs>           Number of times to run specified offset. Minimum of one
@@ -54,12 +54,12 @@ function edit_linker_cache() {
 while getopts "h:m:o:r:s:t:" opt; do
     case "${opt}" in
         # TODO: Maybe move changing cache in ld file to a different script
-        m)
-            m=${OPTARG}
-            [ $m -lt 0 ] \
-            && echo "Monolith cache must be non-negative; $m found"\
-            && exit 1
-            ;;
+        # m)
+        #     m=${OPTARG}
+        #     [ $m -lt 0 ] \
+        #     && echo "Monolith cache must be non-negative; $m found"\
+        #     && exit 1
+        #     ;;
         o)
             o=${OPTARG}
             [ -z $o ] \
@@ -129,10 +129,10 @@ echo "-------------------------------------------------------------------------"
 
 # See TODO
 # Edit the linker script to use the cache size
-edit_linker_cache "$m" "$1"
+# edit_linker_cache "$m" "$1"
 
 IMAGE="$1"
-CACHE_SZ=$((16#${m}))
+# CACHE_SZ=$((16#${m}))
 
 
 if [[ -z $1 ]]; then
