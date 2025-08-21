@@ -17,7 +17,7 @@ OUTPUT_ARCH(riscv)
 PROVIDE(__GLOBAL_CORES = 8 );
 PROVIDE(__GLOBAL_BYTES = 1024);
 /* Cache Bytes */
-CBYTES = 0x0400; /* 1KB of cache */
+CBYTES = 0x0800; /* 1KB of cache */
 
 MEMORY
 {	/* Add RAM that can be read, written, and executed */

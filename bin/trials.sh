@@ -5,24 +5,30 @@ m=1024
 r=100
 s=0
 t=16384
-LD_FILE=riscv32-virt.ld
+
+SRC="../cache_miss"
+LD_FILE="$SRC/riscv32-virt.ld"
 RANGE=true
 SAVE=false
 HEADER="Offset,Data Miss"
 
+# CACHE_SZ=`grep "CBYTES =" $LD_FILE | sed 's/CBYTES = 0x//' | sed 's/;.*//'`
+# CACHE_SZ=$((16#${CACHE_SZ}))
+
 function usage() {
     cat <<EOF
-    $(basename $0) <MONOLITH> [options]
+    $(basename $0) <image> [options]
 
-    Runs the provided RISC-V monolith through QEMU and finds the worst number of
+    Runs the provided RISC-V image through QEMU and finds the worst number of
     data cache misses given the passed in parameters. Defaults to 100 runs to
     calculate average. If [-s] option is not provided it will run through the
-    entire search space [0 - monolith_cache).
+    entire search space [0 - image_cache).
 
     Options:
     -h                  Display this message
-    -m <cache>          Set monolith cache size to <cache>, in bytes.
-                        [default: $m]
+    -m <cache>          Sets the cache size provided by the linker script, in
+                        bytes, and re-links.
+                        [default: 1024]
     -o <file>           Saves output in CSV format to <file>
     -r <runs>           Number of times to run specified offset. Minimum of one
                         [default: $r]
@@ -35,14 +41,19 @@ EOF
     exit 1
 }
 
+# TODO: Don't rebuild all of it, just the ones you need
 function edit_linker_cache() {
     cache="$(printf "%04x" $1)"
+
     sed -i "s/CBYTES = 0x.*;/CBYTES = 0x${cache};/" "$LD_FILE"
+    make -C "$SRC"
+    mv "$SRC/riscv32-img" $2
 }
 
 
-while getopts "hm:o:r:s:t:" opt; do
+while getopts "h:m:o:r:s:t:" opt; do
     case "${opt}" in
+        # TODO: Maybe move changing cache in ld file to a different script
         m)
             m=${OPTARG}
             [ $m -lt 0 ] \
@@ -93,15 +104,16 @@ done
 shift "$((OPTIND-1))"
 
 if [[ $# != 1 ]]; then
-    echo "Missing executable"
+    echo "Missing kernel image"
     exit 1
 elif [[ ! -f $1 ]]; then
-    echo "Could not find executable: $1"
+    echo "Could not find kernel image: $1"
     exit 1
 fi
 
-echo "Running Monolith    : $1" >&2
-echo "Monolith Cache Size : $m bytes" >&2
+echo "Running kernel image: $1" >&2
+echo "Image Cache Size    : $m bytes" >&2
+# echo "Image Cache Size    : $CACHE_SZ bytes" >&2
 echo "Runs per offset     : $r" >&2
 echo "TCG dcachesize      : $t bytes" >&2
 if [ $RANGE = true ]; then
@@ -115,11 +127,13 @@ echo "Saving to           : $o" >&2
 fi
 echo "-------------------------------------------------------------------------"
 
+# See TODO
 # Edit the linker script to use the cache size
-edit_linker_cache "$m"
+edit_linker_cache "$m" "$1"
 
-MONOLITH="$1"
-CACHE_SZ="$m"
+IMAGE="$1"
+CACHE_SZ=$((16#${m}))
+
 
 if [[ -z $1 ]]; then
     usage
@@ -135,13 +149,13 @@ CSV=$(
             HEX_OFFSET=$(printf "%08x" $OFFSET)
             QEMU_PARAM="0x$HEX_OFFSET"
 
-            echo "Current Offset: $QEMU_PARAM" >&2
-
             MAX=0
+
+            printf "Curent offset: ${QEMU_PARAM}\n" >&2
             for i in $(seq 1 $r); do
 
                 # Pass offset to qemu
-                ../bin/qemu.sh "$MONOLITH" "$QEMU_PARAM" "$t" > /dev/null
+                ./qemu.sh "$IMAGE" "$QEMU_PARAM" "$t" > /dev/null
 
                 DMISS=`head cache.log | awk 'NR == 2 {print $3}'`
 
@@ -159,9 +173,11 @@ CSV=$(
 
         echo "$HEADER"
 
-        #
+
         for i in $(seq 1 $r); do
-            ../bin/qemu.sh "$MONOLITH" "0x$OFFSET" "$t" > /dev/null
+            printf "Run: $i\n" >&2
+
+            ./qemu.sh "$IMAGE" "0x$OFFSET" "$t" > /dev/null
             DMISS=`head cache.log | awk 'NR == 2 {print $3}'`
             if [[ $MAX -lt $DMISS ]]; then
                 MAX=$DMISS
