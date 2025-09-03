@@ -1,19 +1,23 @@
 #! /bin/bash
 
+
+
 ### Defaults
 m=1024
 r=100
 s=0
-t=16384
+t=1024
+o=cache_miss.csv
 
-SRC="../cache_miss"
+SILENT=false
+SRC="./cache_miss"
 LD_FILE="$SRC/riscv32-virt.ld"
 RANGE=true
 SAVE=false
 HEADER="Offset,Data Miss"
 
-CACHE_SZ=`grep "CBYTES =" $LD_FILE | sed 's/CBYTES = 0x//' | sed 's/;.*//'`
-CACHE_SZ=$((16#${CACHE_SZ}))
+# CACHE_SZ=`grep "CBYTES =" $LD_FILE | sed 's/CBYTES = 0x//' | sed 's/;.*//'`
+# CACHE_SZ=$((16#${CACHE_SZ}))
 
 function usage() {
     cat <<EOF
@@ -28,8 +32,10 @@ function usage() {
     -h                  Display this message
     -m <cache>          Sets the cache size provided by the linker script, in
                         bytes, and re-links. (WIP)
-                        [default: 1024]
-    -o <file>           Saves output in CSV format to <file>
+                        [default: $m]
+    -o <file>           Saves output in CSV format to <file>. If <runs> exceeds
+                        10 runs it will output results to a default csv.
+                        [default: cache_miss.csv]
     -r <runs>           Number of times to run specified offset. Minimum of one
                         [default: $r]
     -s <stack_offset>   Set stack's offset; must be divisible by four.
@@ -50,8 +56,11 @@ function edit_linker_cache() {
     mv "$SRC/riscv32-img" $2
 }
 
+if [[ $# == 0 ]]; then
+    usage
+fi
 
-while getopts "h:m:o:r:s:t:" opt; do
+while getopts "Sh:m:o:r:s:t:" opt; do
     case "${opt}" in
         # TODO: Maybe move changing cache in ld file to a different script
         # m)
@@ -60,6 +69,9 @@ while getopts "h:m:o:r:s:t:" opt; do
         #     && echo "Monolith cache must be non-negative; $m found"\
         #     && exit 1
         #     ;;
+        S)
+            SILENT=true
+            ;;
         o)
             o=${OPTARG}
             [ -z $o ] \
@@ -111,8 +123,10 @@ elif [[ ! -f $1 ]]; then
     exit 1
 fi
 
+# CACHE_SZ=$((t))
+CACHE_SZ=$((16#8000))
 echo "Running kernel image: $1" >&2
-echo "Image Cache Size    : $m bytes" >&2
+echo "Image Cache Size    : $CACHE_SZ bytes" >&2
 # echo "Image Cache Size    : $CACHE_SZ bytes" >&2
 echo "Runs per offset     : $r" >&2
 echo "TCG dcachesize      : $t bytes" >&2
@@ -134,63 +148,72 @@ echo "-------------------------------------------------------------------------"
 IMAGE="$1"
 # CACHE_SZ=$((16#${m}))
 
-
 if [[ -z $1 ]]; then
     usage
 fi
 
 CSV=$(
+    HEADER="Offset"
+    STATS="$IMAGE, $t, $r"
+
+    for i in $(seq 1 $r); do
+        HEADER+=",Run $i"
+    done
+
+    # for i in $(seq 3 $r); do
+    #     STATS+=","
+    # done
+
+    echo "$HEADER"
+
     # Go through whole search space
     if [ $RANGE = true ]; then
         # Increments of 4
 
-        echo "$HEADER"
         for OFFSET in $(seq 0 4 $CACHE_SZ); do
             HEX_OFFSET=$(printf "%08x" $OFFSET)
             QEMU_PARAM="0x$HEX_OFFSET"
 
-            MAX=0
-
-            printf "Curent offset: ${QEMU_PARAM}\n" >&2
+            $SILENT || printf "Curent offset: ${QEMU_PARAM}\n" >&2
+            DMISS_ARR=""
             for i in $(seq 1 $r); do
 
                 # Pass offset to qemu
-                ./qemu.sh "$IMAGE" "$QEMU_PARAM" "$t" > /dev/null
+                ./bin/qemu.sh "$IMAGE" "$QEMU_PARAM" "$t" > /dev/null
 
                 DMISS=`head cache.log | awk 'NR == 2 {print $3}'`
-
-                if [[ $MAX -lt $DMISS ]]; then
-                    MAX=$DMISS
-                fi
+                DMISS_ARR+=",$DMISS"
             done
-            echo "${QEMU_PARAM},${MAX}"
+            echo "${QEMU_PARAM}${DMISS_ARR}"
         done
 
     # Go through one specific offset
     else
         OFFSET="$(printf "%08x" $s)"
-        MAX=0
-
-        echo "$HEADER"
-
+        DMISS_ARR=""
 
         for i in $(seq 1 $r); do
-            printf "Run: $i\n" >&2
+            $SILENT || printf "Run: $i\n" >&2
 
-            ./qemu.sh "$IMAGE" "0x$OFFSET" "$t" > /dev/null
+            ./bin/qemu.sh "$IMAGE" "0x$OFFSET" "$t" > /dev/null
             DMISS=`head cache.log | awk 'NR == 2 {print $3}'`
-            if [[ $MAX -lt $DMISS ]]; then
-                MAX=$DMISS
-            fi
+            DMISS_ARR+=",$DMISS"
+
         done
-        echo "0x${OFFSET},${MAX}"
+        echo "0x${OFFSET}${DMISS_ARR}"
 
     fi
+    echo "$STATS"
+
 )
 
 echo "-------------------------------------------------------------------------"
-echo "$CSV" | column -t -s ','
+if [ $r -le 10 ]; then
+    echo "$CSV" | column -t -s ','
+else
+    echo "Too many runs to display; saving to $o"
+fi
 
-if [ $SAVE = true ]; then
+if [[ $SAVE = true || $r -gt 10 ]]; then
     echo "$CSV" > "$o"
 fi
