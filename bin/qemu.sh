@@ -18,7 +18,7 @@ opts+=" --plugin ${PLUGIN}"
 opts+=",dcachesize=$3,dassoc=2,dblksize=32"
 opts+=',icachesize=16384,iassoc=2,iblksize=32'
 opts+=' -d plugin'
-opts+=' -D cache.log'
+opts+=" -D $4"
 opts+=" -device loader,addr=0x80100000,data=$2,data-len=4"
 opts+=" -kernel $1"	# the kernel to add
 
