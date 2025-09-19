@@ -123,8 +123,8 @@ elif [[ ! -f $1 ]]; then
     exit 1
 fi
 
-# CACHE_SZ=$((t))
-CACHE_SZ=$((16#8000))
+CACHE_SZ=$((t))
+# CACHE_SZ=$((16#8000))
 echo "Running kernel image: $1" >&2
 echo "Image Cache Size    : $CACHE_SZ bytes" >&2
 # echo "Image Cache Size    : $CACHE_SZ bytes" >&2
@@ -160,11 +160,8 @@ CSV=$(
         HEADER+=",Run $i"
     done
 
-    # for i in $(seq 3 $r); do
-    #     STATS+=","
-    # done
-
     echo "$HEADER"
+    CACHE_LOG=`basename $IMAGE | sed 's/-img/.log/'`
 
     # Go through whole search space
     if [ $RANGE = true ]; then
@@ -179,9 +176,9 @@ CSV=$(
             for i in $(seq 1 $r); do
 
                 # Pass offset to qemu
-                ./bin/qemu.sh "$IMAGE" "$QEMU_PARAM" "$t" > /dev/null
+                ./bin/qemu.sh "$IMAGE" "$QEMU_PARAM" "$t" "$CACHE_LOG" > /dev/null
 
-                DMISS=`head cache.log | awk 'NR == 2 {print $3}'`
+                DMISS=`head $CACHE_LOG | awk 'NR == 2 {print $3}'`
                 DMISS_ARR+=",$DMISS"
             done
             echo "${QEMU_PARAM}${DMISS_ARR}"
@@ -195,8 +192,8 @@ CSV=$(
         for i in $(seq 1 $r); do
             $SILENT || printf "Run: $i\n" >&2
 
-            ./bin/qemu.sh "$IMAGE" "0x$OFFSET" "$t" > /dev/null
-            DMISS=`head cache.log | awk 'NR == 2 {print $3}'`
+            ./bin/qemu.sh "$IMAGE" "0x$OFFSET" "$t" "$CACHE_LOG" > /dev/null
+            DMISS=`head $CACHE_LOG | awk 'NR == 2 {print $3}'`
             DMISS_ARR+=",$DMISS"
 
         done
@@ -215,5 +212,6 @@ else
 fi
 
 if [[ $SAVE = true || $r -gt 10 ]]; then
+    touch "$o"
     echo "$CSV" > "$o"
 fi
