@@ -17,6 +17,9 @@ ASMOBJS=$(patsubst asm/%.s,${OBJDIR}/%.o, $(wildcard asm/*.s))
 
 all: libfj.a riscv32-img
 
+rv32-abi: CFLAGS+=-march=rv32g -mabi=ilp32d
+rv32-abi: all
+
 $(OBJECTS): ${OBJDIR}/%.o : src/%.c | ${OBJDIR}
 	$(CC) $(CFLAGS) -c $< -o $@
 
